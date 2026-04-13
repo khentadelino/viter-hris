@@ -28,7 +28,7 @@ const Header = () => {
             <button
               onClick={handleShowNavigation}
               className={`py-4 pl-1 pr-4 text-gray-600 bg-white z-50 flex items-center rounded-br-sm focus:outline-0 cursor-pointer duration-200 ease-in`}
-              //   title={store.isNavFullShow ? "Expand" : "Collapse"}
+              // title={store.isNavFullShow ? "Expand" : "Collapse"}
             >
               <FaIndent
               // className={`text-sm hover:text-secondary ${
@@ -37,7 +37,7 @@ const Header = () => {
               />
             </button>
             <div className="pl-1">
-              <img src="" alt="" />
+              <img src="null" alt="" />
             </div>
           </div>
         </div>
