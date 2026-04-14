@@ -175,11 +175,11 @@
 /* ================= COMPONENTS ================= */
 @layer components {
   .container {
-    @apply max-w-[1440px] mx-auto px-4 xl:px-16 w-full;
+    @apply max-w-360 mx-auto px-4 xl:px-16 w-full;
   }
 
   .wrapper {
-    @apply relative min-h-[100dvh] pt-[58px] ml-10 pr-6 pl-4 transition-all duration-150;
+    @apply relative min-h-dvh print:pt-0 pt-20 ml-56 pr-6 pl-4 transition-all duration-150;
   }
 
   /* HEADER */
