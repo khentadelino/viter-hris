@@ -8,3 +8,12 @@ export const urlDeveloper = "developer";
 
 // dev API KEY
 export const devKey = "123devkey";
+
+export const isEmptyItem = (item, x = "") => {
+  let result = x;
+
+  if (typeof item !== "undefined" && item !== "") {
+    result = item;
+  }
+  return result;
+};

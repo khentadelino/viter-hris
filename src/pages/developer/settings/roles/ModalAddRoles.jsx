@@ -11,6 +11,9 @@ import {
   setSuccess,
 } from "../../../../store/StoreAction";
 import ModalWrapperSide from "../../../../partials/modals/ModalWrapperSide";
+import { FaTimes } from "react-icons/fa";
+import { Form, Formik } from "formik";
+import { InputText } from "../../../../components/form-inputs/FormInputs";
 
 const ModalAddRoles = ({ itemEdit }) => {
   const { store, dispatch } = React.useContext(StoreContext);
@@ -62,9 +65,41 @@ const ModalAddRoles = ({ itemEdit }) => {
           <h3 className="text-dark text-sm">
             {itemEdit ? "Update" : "Add"}Role
           </h3>
+          <button
+            type="button"
+            onClick={handleClose}
+            className="absolute top-0 right-4"
+          >
+            <FaTimes />
+          </button>
         </div>
         {/* BODY */}
-        <div></div>
+        <div className="modal-body">
+          <Formik
+            initialValues={initVal}
+            validationSchema={yupScheme}
+            onSubmit={async () => {}}
+          >
+            {(props) => {
+              return (
+                <Form className="h-full">
+                  <div className="modal-form-container">
+                    <div className="modal-container">
+                      <div className="relative mt-5 mb-6">
+                        <InputText
+                          label="Name"
+                          name="role_name"
+                          type="text"
+                          disabled={mutation.isPending}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </Form>
+              );
+            }}
+          </Formik>
+        </div>
       </ModalWrapperSide>
     </>
   );
