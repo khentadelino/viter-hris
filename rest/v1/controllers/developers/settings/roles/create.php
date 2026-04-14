@@ -3,6 +3,6 @@
 $conn = null;
 $conn = checkDbConnection($conn);
 
-$name = $data['name'];
+$role_name = $data['role_name'];
 
-echo "Hello";
+returnError($role_name);

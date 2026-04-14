@@ -13,7 +13,11 @@ import {
 import ModalWrapperSide from "../../../../partials/modals/ModalWrapperSide";
 import { FaTimes } from "react-icons/fa";
 import { Form, Formik } from "formik";
-import { InputText } from "../../../../components/form-inputs/FormInputs";
+import {
+  InputText,
+  InputTextArea,
+} from "../../../../components/form-inputs/FormInputs";
+import ButtonSpinner from "../../../../partials/spinners/ButtonSpinner";
 
 const ModalAddRoles = ({ itemEdit }) => {
   const { store, dispatch } = React.useContext(StoreContext);
@@ -78,14 +82,16 @@ const ModalAddRoles = ({ itemEdit }) => {
           <Formik
             initialValues={initVal}
             validationSchema={yupScheme}
-            onSubmit={async () => {}}
+            onSubmit={async (values, { setSubmitting, resetForm }) => {
+              mutation.mutate(values);
+            }}
           >
             {(props) => {
               return (
                 <Form className="h-full">
                   <div className="modal-form-container">
                     <div className="modal-container">
-                      <div className="relative mt-5 mb-6">
+                      <div className="relative mb-6">
                         <InputText
                           label="Name"
                           name="role_name"
@@ -93,6 +99,37 @@ const ModalAddRoles = ({ itemEdit }) => {
                           disabled={mutation.isPending}
                         />
                       </div>
+                      <div className="relative mb-6">
+                        <InputTextArea
+                          label="Description"
+                          name="role_description"
+                          type="text"
+                          disabled={mutation.isPending}
+                        />
+                      </div>
+                    </div>
+                    <div className="modal-action">
+                      <button
+                        type="submit"
+                        disabled={mutation.isPending || !props.dirty}
+                        className="btn-modal-submit"
+                      >
+                        {mutation.isPending ? (
+                          <ButtonSpinner />
+                        ) : itemEdit ? (
+                          "Save"
+                        ) : (
+                          "Add"
+                        )}
+                      </button>
+                      <button
+                        type="reset"
+                        className="btn-modal-cancel"
+                        onClick={handleClose}
+                        disabled={mutation.isPending}
+                      >
+                        Cancel
+                      </button>
                     </div>
                   </div>
                 </Form>

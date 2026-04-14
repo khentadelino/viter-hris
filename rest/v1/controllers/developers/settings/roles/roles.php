@@ -1,6 +1,6 @@
 <?php
 
-require '../../../core/header.php';
+require '../../../../core/header.php';
 require '../../../core/functions.php';
 
 //get payload from frontend

@@ -56,65 +56,63 @@ export const InputText = ({
   const { dispatch } = React.useContext(StoreContext);
   const [field, meta] = useField(props);
 
-  const showError = meta.touched && meta.error;
-
   if (props.number === "number") {
     return (
-      <div className="flex flex-col gap-1">
-        {label && <label htmlFor={props.id || props.name}>{label}</label>}
+      <>
+        {label !== "" && (
+          <label htmlFor={props.id || props.name}>
+            {required && <span className="text-alert">*</span>}
+            {label}
+          </label>
+        )}
+        <NumericFormat
+          {...field}
+          {...props}
+          allowLeadingZeros
+          autoComplete="off"
+          className={`${
+            meta.touched && meta.error ? "error-show" : null
+          }  ${className}`}
+          onChange={(e) => {
+            onChange !== null && onChange(e);
+            field.onChange(e);
+            dispatch(setError(false));
+          }}
+        />
 
-        <div className="relative">
-          <NumericFormat
-            {...field}
-            {...props}
-            allowLeadingZeros
-            autoComplete="off"
-            className={`${showError ? "error-show" : ""} ${className}`}
-            onChange={(e) => {
-              onChange && onChange(e);
-              field.onChange(e);
-              dispatch(setError(false));
-            }}
-          />
-
-          {required && (
-            <span className="absolute bottom-1 right-2 text-alert text-xs">
-              *
-            </span>
-          )}
-        </div>
-
-        {showError && <span className="error-show">{meta.error}</span>}
-      </div>
+        {meta.touched && meta.error ? (
+          <span className={`error-show`}>{meta.error}</span>
+        ) : null}
+      </>
     );
   }
 
   return (
-    <div className="flex flex-col gap-1">
-      {label && <label htmlFor={props.id || props.name}>{label}</label>}
+    <>
+      <input
+        {...field}
+        {...props}
+        className={`${
+          meta.touched && meta.error ? `error-show ` : ""
+        } ${className} `}
+        autoComplete="off"
+        onChange={(e) => {
+          onChange !== null && onChange(e);
+          field.onChange(e);
+        }}
+        ref={refVal}
+      />
+      {label !== "" && typeof label !== "undefined" && (
+        <label htmlFor={props.id || props.name}>
+          {required && <span className="text-alert">*</span>}
+          {label}
+        </label>
+      )}
 
-      <div className="relative">
-        <input
-          {...field}
-          {...props}
-          className={`${showError ? "error-show" : ""} ${className}`}
-          autoComplete="off"
-          onChange={(e) => {
-            onChange && onChange(e);
-            field.onChange(e);
-          }}
-          ref={refVal}
-        />
-
-        {required && (
-          <span className="absolute bottom-1 right-2 text-alert text-xs">
-            *
-          </span>
-        )}
-      </div>
-
-      {showError && <span className="error-show">{meta.error}</span>}
-    </div>
+      {meta.touched && meta.error ? (
+        <span className="error-show">{meta.error}</span>
+      ) : null}
+    </>
   );
 };
 
