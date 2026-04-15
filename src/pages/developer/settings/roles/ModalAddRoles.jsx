@@ -33,7 +33,7 @@ const ModalAddRoles = ({ itemEdit }) => {
         values,
       ),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: "roles" });
+      queryClient.invalidateQueries({ queryKey: ["roles"] });
       if (data.success) {
         dispatch(setSuccess(true));
         dispatch(
