@@ -27,8 +27,8 @@ const ModalAddRoles = ({ itemEdit }) => {
     mutationFn: (values) =>
       queryData(
         itemEdit
-          ? `${apiVersion}/controllers/developers/settings/roles/roles.php`
-          : `${apiVersion}/controllers/developers/settings/roles/roles.php`,
+          ? `${apiVersion}/controllers/developers/settings/roles/roles.php?id=${itemEdit.role_aid}` //Update
+          : `${apiVersion}/controllers/developers/settings/roles/roles.php`, //Create
         itemEdit ? "put" : "post",
         values,
       ),
@@ -50,8 +50,8 @@ const ModalAddRoles = ({ itemEdit }) => {
 
   const initVal = {
     ...itemEdit,
-    role_name: "",
-    role_description: "",
+    role_name: itemEdit ? itemEdit.role_name : "",
+    role_description: itemEdit ? itemEdit.role_description : "",
   };
 
   const yupScheme = Yup.object({ role_name: Yup.string().trim().required() });
