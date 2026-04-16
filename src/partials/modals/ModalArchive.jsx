@@ -1,20 +1,17 @@
-import { queryData } from "@/components/custom-hooks/queryData";
-import {
-  handleEscape,
-  isEmptyItem,
-} from "@/components/helpers/functions-general";
+import React from "react";
+import { FaQuestion } from "react-icons/fa";
+import ButtonSpinner from "../spinners/ButtonSpinner";
+import MessageError from "../MessageError";
+import { queryData } from "../../functions/custom-hooks/queryData";
+import { StoreContext } from "../../store/StoreContext";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   setError,
   setIsArchive,
   setMessage,
   setSuccess,
-} from "@/store/StoreAction";
-import { StoreContext } from "@/store/StoreContext";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import React from "react";
-import { FaQuestion } from "react-icons/fa";
-import ButtonSpinner from "../spinners/ButtonSpinner";
-import MessageError from "../MessageError";
+} from "../../store/StoreAction";
+import { handleEscape, isEmptyItem } from "../../functions/functions-general";
 
 const ModalArchive = ({
   mysqlApiArchive,
