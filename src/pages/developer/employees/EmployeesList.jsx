@@ -20,6 +20,7 @@ import {
   setIsRestore,
 } from "../../../store/StoreAction";
 import { FaArchive, FaEdit, FaTrash, FaTrashRestore } from "react-icons/fa";
+import SearchBar from "../../../partials/SearchBar";
 
 const EmployeesList = ({ itemEdit, setItemEdit }) => {
   const { store, dispatch } = React.useContext(StoreContext);
@@ -43,7 +44,7 @@ const EmployeesList = ({ itemEdit, setItemEdit }) => {
     status,
   } = useInfiniteQuery({
     queryKey: ["employees", search.current.value, store.isSearch, filterData],
-    queryFn: async ({ pageParam = 0 }) =>
+    queryFn: async ({ pageParam = 1 }) =>
       await queryDataInfinite(
         `${apiVersion}/employees/search`, // search endpoint
         `${apiVersion}/controllers/developers/employees/page.php?start=${pageParam}`, // list endpoint
@@ -89,6 +90,27 @@ const EmployeesList = ({ itemEdit, setItemEdit }) => {
   };
   return (
     <>
+      <div className="flex items-center justify-between">
+        <div className="relative">
+          <label htmlFor="">Status</label>
+          <select
+            onChange={(e) => setFilterData(e.target.value)}
+            value={filterData}
+          >
+            <option value="">All</option>
+            <option value="1">Active</option>
+            <option value="0">Inactive</option>
+          </select>
+        </div>
+        <SearchBar
+          search={search}
+          dispatch={dispatch}
+          store={store}
+          result={result?.pages}
+          isFetching={isFetching}
+          setOnSearch={setOnSearch}
+        />
+      </div>
       <div className="relative pt-4 rounded-md">
         {status !== "pending" && isFetching && <FetchingSpinner />}
         <table>

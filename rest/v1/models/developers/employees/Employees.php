@@ -147,7 +147,7 @@ class Employees
             $query = $this->connection->prepare($sql);
 
             $query->execute([
-                "start" => $this->start,
+                "start" => $this->start - 1,
                 "total" => $this->total,
 
                 ...($hasActiveFilter ? [
