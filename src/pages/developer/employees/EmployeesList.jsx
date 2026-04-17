@@ -8,6 +8,18 @@ import NoData from "../../../partials/NoData";
 import ServerError from "../../../partials/ServerError";
 import TableLoading from "../../../partials/TableLoading";
 import FetchingSpinner from "../../../partials/spinners/FetchingSpinner";
+import Loadmore from "../../../partials/Loadmore";
+import Status from "../../../partials/Status";
+import ModalArchive from "../../../partials/modals/ModalArchive";
+import ModalRestore from "../../../partials/modals/ModalRestore";
+import ModalDelete from "../../../partials/modals/ModalDelete";
+import {
+  setIsAdd,
+  setIsArchive,
+  setIsDelete,
+  setIsRestore,
+} from "../../../store/StoreAction";
+import { FaArchive, FaEdit, FaTrash, FaTrashRestore } from "react-icons/fa";
 
 const EmployeesList = ({ itemEdit, setItemEdit }) => {
   const { store, dispatch } = React.useContext(StoreContext);
@@ -30,8 +42,8 @@ const EmployeesList = ({ itemEdit, setItemEdit }) => {
     isFetchingNextPage,
     status,
   } = useInfiniteQuery({
-    queryKey: ["donations", search.current.value, store.isSearch, filterData],
-    queryFn: async ({ pageParam = 1 }) =>
+    queryKey: ["employees", search.current.value, store.isSearch, filterData],
+    queryFn: async ({ pageParam = 0 }) =>
       await queryDataInfinite(
         `${apiVersion}/employees/search`, // search endpoint
         `${apiVersion}/controllers/developers/employees/page.php?start=${pageParam}`, // list endpoint
@@ -44,7 +56,7 @@ const EmployeesList = ({ itemEdit, setItemEdit }) => {
         `post`,
       ),
     getNextPageParam: (lastPage) => {
-      if (lastPage.page < lastPage.total) {
+      if (lastPage.page + lastPage.count < lastPage.total) {
         return lastPage.page + lastPage.count;
       }
 
@@ -53,11 +65,28 @@ const EmployeesList = ({ itemEdit, setItemEdit }) => {
     refetchOnWindowFocus: false,
   });
   React.useEffect(() => {
-    if (inView) {
+    if (inView && hasNextPage) {
       setPage((prev) => prev + 1);
       fetchNextPage();
     }
-  }, [inView]);
+  }, [fetchNextPage, hasNextPage, inView]);
+
+  const handleEdit = (item) => {
+    dispatch(setIsAdd(true));
+    setItemEdit(item);
+  };
+  const handleArchive = (item) => {
+    dispatch(setIsArchive(true));
+    setItemEdit(item);
+  };
+  const handleRestore = (item) => {
+    dispatch(setIsRestore(true));
+    setItemEdit(item);
+  };
+  const handleDelete = (item) => {
+    dispatch(setIsDelete(true));
+    setItemEdit(item);
+  };
   return (
     <>
       <div className="relative pt-4 rounded-md">
@@ -69,6 +98,7 @@ const EmployeesList = ({ itemEdit, setItemEdit }) => {
               <th>Status</th>
               <th>Employee Name</th>
               <th>Email</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -91,9 +121,118 @@ const EmployeesList = ({ itemEdit, setItemEdit }) => {
                 </td>
               </tr>
             )}
+            {result?.pages?.map((page, key) => (
+              <React.Fragment key={key}>
+                {page?.data?.map((item, key) => {
+                  return (
+                    <tr key={key}>
+                      <td>{counter++}</td>
+                      <td>
+                        <Status
+                          text={`${item.employee_is_active == 1 ? "active" : "inactive"}`}
+                        />
+                      </td>
+                      <td>
+                        {item.employee_first_name} {item.employee_last_name}
+                      </td>
+                      <td>{item.employee_email}</td>
+                      <td>
+                        <div>
+                          {item.employee_is_active == 1 ? (
+                            <>
+                              <button
+                                type="button"
+                                className="tooltip-action-table"
+                                data-tooltip="Edit"
+                                onClick={() => handleEdit(item)}
+                              >
+                                <FaEdit />
+                              </button>
+                              <button
+                                type="button"
+                                className="tooltip-action-table"
+                                data-tooltip="Archive"
+                                onClick={() => handleArchive(item)}
+                              >
+                                <FaArchive />
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button
+                                type="button"
+                                className="tooltip-action-table"
+                                data-tooltip="Restore"
+                                onClick={() => handleRestore(item)}
+                              >
+                                <FaTrashRestore />
+                              </button>
+                              <button
+                                type="button"
+                                className="tooltip-action-table"
+                                data-tooltip="Delete"
+                                onClick={() => handleDelete(item)}
+                              >
+                                <FaTrash />
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </React.Fragment>
+            ))}
           </tbody>
         </table>
+
+        <div className="loadmore flex justify-center flex-col items-center pb-10">
+          <Loadmore
+            fetchNextPage={fetchNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+            hasNextPage={hasNextPage}
+            result={result?.pages[0]}
+            setPage={setPage}
+            page={page}
+            refView={ref}
+            isSearchOrFilter={store.isSearch || result?.isFilter}
+          />
+        </div>
       </div>
+
+      {store.isArchive && itemEdit && (
+        <ModalArchive
+          mysqlApiArchive={`${apiVersion}/controllers/developers/employees/active.php?id=${itemEdit.employee_aid}`}
+          msg="Are you sure you want to archive this record?"
+          successMsg="Successfully Archived"
+          item={`${itemEdit.employee_first_name} ${itemEdit.employee_last_name}`}
+          dataItem={itemEdit}
+          queryKey="employees"
+        />
+      )}
+
+      {store.isRestore && itemEdit && (
+        <ModalRestore
+          mysqlApiRestore={`${apiVersion}/controllers/developers/employees/active.php?id=${itemEdit.employee_aid}`}
+          msg="Are you sure you want to Restore this record?"
+          successMsg="Successfully Restored"
+          item={`${itemEdit.employee_first_name} ${itemEdit.employee_last_name}`}
+          dataItem={itemEdit}
+          queryKey="employees"
+        />
+      )}
+
+      {store.isDelete && itemEdit && (
+        <ModalDelete
+          mysqlApiDelete={`${apiVersion}/controllers/developers/employees/employees.php?id=${itemEdit.employee_aid}`}
+          msg="Are you sure you want to Delete this record?"
+          successMsg="Successfully Deleted"
+          item={`${itemEdit.employee_first_name} ${itemEdit.employee_last_name}`}
+          dataItem={itemEdit}
+          queryKey="employees"
+        />
+      )}
     </>
   );
 };

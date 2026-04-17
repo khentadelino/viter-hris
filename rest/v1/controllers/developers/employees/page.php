@@ -11,7 +11,6 @@ $val = new Employees($conn);
 //get payload from frontend
 $body = file_get_contents("php://input");
 $data = json_decode($body, true);
-
 if (array_key_exists('start', $_GET)) {
     checkPayload($data);
     $val->start = $_GET['start'];
@@ -21,11 +20,12 @@ if (array_key_exists('start', $_GET)) {
 
 
 
+
     checkLimitId($val->start, $val->total);
     $query = checkReadLimit($val);
     $total_result = checkReadAll($val);
     http_response_code(200);
-    checkReadQuery($query, $total_result, $val->start, $val->total);
+    checkReadQuery($query, $total_result, $val->total, $val->start);
 }
 
 checkEndpoint();

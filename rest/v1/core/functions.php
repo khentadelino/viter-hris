@@ -164,13 +164,16 @@ function checkReadQuery($query, $total_result, $object_total, $object_start)
 {
     $response = new Response();
     $returnData = [];
+    $perPage = (int)$object_total;
+    $start = (int)$object_start;
+    $totalRows = $total_result->rowCount();
 
     $returnData["data"] = getResultData($query);
     $returnData["count"] = $query->rowCount();
-    $returnData["total"] = $total_result->rowCount();
-    $returnData["per_page"] = $object_total;
-    $returnData["page"] = (int)$object_start;
-    $returnData["total_pages"] = ceil($total_result->rowCount() / $object_total);
+    $returnData["total"] = $totalRows;
+    $returnData["per_page"] = $perPage;
+    $returnData["page"] = $start;
+    $returnData["total_pages"] = $perPage > 0 ? (int)ceil($totalRows / $perPage) : 0;
     $returnData["success"] = true;
     $returnData["server_datetime"] = date('Y-m-d H:i:s');
     $returnData["server_date"] = date('Y-m-d');

@@ -69,22 +69,25 @@ class Employees
     public function readAll()
     {
         try {
+            $hasActiveFilter = $this->employee_is_active !== null && $this->employee_is_active !== "";
+
             $sql = "select ";
             $sql .= " * ";
             $sql .= " from {$this->tblEmployees} ";
             $sql .= " where true ";
-            $sql .= $this->employee_is_active ? " and employee_is_active = :employee_is_active" : " ";
+            $sql .= $hasActiveFilter ? " and employee_is_active = :employee_is_active" : " ";
             $sql .= $this->search != "" ? " and ( " : " ";
             $sql .= $this->search != "" ? " employee_first_name like :employee_first_name " : " ";
             $sql .= $this->search != "" ? " or employee_middle_name like :employee_middle_name " : " ";
             $sql .= $this->search != "" ? " or employee_last_name like :employee_last_name " : " ";
             $sql .= $this->search != "" ? " or employee_email like :employee_email " : " ";
             $sql .= $this->search != "" ? " ) " : " ";
+            $sql .= " order by employee_aid asc ";
 
             $query = $this->connection->prepare($sql);
 
             $query->execute([
-                ...($this->employee_is_active ? [
+                ...($hasActiveFilter ? [
                     "employee_is_active" => $this->employee_is_active
                 ] : []),
 
@@ -101,20 +104,43 @@ class Employees
 
         return $query;
     }
-    public function readLimit()
+
+    public function readById()
     {
         try {
             $sql = "select ";
             $sql .= " * ";
             $sql .= " from {$this->tblEmployees} ";
+            $sql .= " where employee_aid = :employee_aid ";
+
+            $query = $this->connection->prepare($sql);
+            $query->execute([
+                ":employee_aid" => $this->employee_aid,
+            ]);
+        } catch (PDOException $e) {
+            $query = false;
+        }
+
+        return $query;
+    }
+
+    public function readLimit()
+    {
+        try {
+            $hasActiveFilter = $this->employee_is_active !== null && $this->employee_is_active !== "";
+
+            $sql = "select ";
+            $sql .= " * ";
+            $sql .= " from {$this->tblEmployees} ";
             $sql .= " where true ";
-            $sql .= $this->employee_is_active ? " and employee_is_active = :employee_is_active" : " ";
+            $sql .= $hasActiveFilter ? " and employee_is_active = :employee_is_active" : " ";
             $sql .= $this->search != "" ? " and ( " : " ";
             $sql .= $this->search != "" ? " employee_first_name like :employee_first_name " : " ";
             $sql .= $this->search != "" ? " or employee_middle_name like :employee_middle_name " : " ";
             $sql .= $this->search != "" ? " or employee_last_name like :employee_last_name " : " ";
             $sql .= $this->search != "" ? " or employee_email like :employee_email " : " ";
             $sql .= $this->search != "" ? " ) " : " ";
+            $sql .= " order by employee_aid asc ";
             $sql .= " limit :start, ";
             $sql .= " :total ";
 
@@ -124,7 +150,7 @@ class Employees
                 "start" => $this->start,
                 "total" => $this->total,
 
-                ...($this->employee_is_active ? [
+                ...($hasActiveFilter ? [
                     "employee_is_active" => $this->employee_is_active
                 ] : []),
 
@@ -145,6 +171,7 @@ class Employees
     {
         try {
             $sql = "update {$this->tblEmployees} set ";
+            $sql .= " employee_is_active = :employee_is_active, ";
             $sql .= " employee_first_name = :employee_first_name, ";
             $sql .= " employee_middle_name = :employee_middle_name, ";
             $sql .= " employee_last_name = :employee_last_name, ";
@@ -154,6 +181,7 @@ class Employees
 
             $query = $this->connection->prepare($sql);
             $query->execute([
+                ":employee_is_active" => $this->employee_is_active,
                 ":employee_first_name" => $this->employee_first_name,
                 ":employee_middle_name" => $this->employee_middle_name,
                 ":employee_last_name" => $this->employee_last_name,
@@ -206,21 +234,26 @@ class Employees
         return $query;
     }
 
-    // public function checkName()
-    // {
-    //     try {
-    //         $sql = "select ";
-    //         $sql .= " employee_name ";
-    //         $sql .= " from {$this->tblEmployees} ";
-    //         $sql .= " where employee_name = :employee_name ";
-    //         $query = $this->connection->prepare($sql);
-    //         $query->execute([
-    //             "employee_name" => $this->employee_name,
-    //         ]);
-    //     } catch (PDOException $e) {
-    //         $query = false;
-    //     }
+    public function checkEmail()
+    {
+        try {
+            $sql = "select ";
+            $sql .= " employee_email ";
+            $sql .= " from {$this->tblEmployees} ";
+            $sql .= " where employee_email = :employee_email ";
+            $sql .= $this->employee_aid ? " and employee_aid != :employee_aid " : " ";
 
-    //     return $query;
-    // }
+            $query = $this->connection->prepare($sql);
+            $query->execute([
+                ":employee_email" => $this->employee_email,
+                ...($this->employee_aid ? [
+                    "employee_aid" => $this->employee_aid,
+                ] : []),
+            ]);
+        } catch (PDOException $e) {
+            $query = false;
+        }
+
+        return $query;
+    }
 }
