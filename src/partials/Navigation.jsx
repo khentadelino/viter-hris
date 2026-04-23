@@ -33,7 +33,7 @@ const Navigation = ({ navigationList = [], menu = "", submenu = "" }) => {
         <nav
           className={`${
             store.isShow ? "translate-x-0" : ""
-          }  h-dvh duration-200 ease-in fixed z-40
+          } h-dvh duration-200 ease-in fixed z-40
             "h-[calc(100%-30px)]" : "h-full"
           } overflow-y-auto w-[14rem] print:hidden py-3 uppercase pt-[76px]`}
           ref={scrollRef}
@@ -42,10 +42,11 @@ const Navigation = ({ navigationList = [], menu = "", submenu = "" }) => {
           <div className="text-sm text-white flex flex-col justify-between h-full">
             <ul>
               {navigationList.map((item, key) => {
+                console.log(item);
                 return (
                   <li
                     key={key}
-                    className={`w-full h-fit flex items-center gap-2 ${item.subNavList && "flex-col gap-0.5!"}`}
+                    className={`h-fit flex items-center gap-2 ${item.subNavList && "flex-col gap-0.5!"}`}
                   >
                     {item.subNavList ? (
                       <NavigationAccordions

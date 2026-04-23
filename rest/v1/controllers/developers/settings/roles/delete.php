@@ -1,4 +1,16 @@
 <?php
+// CORS headers - must be first
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Credentials: true");
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+header("Access-Control-Allow-Methods: PUT, POST, GET, OPTIONS, DELETE");
+
+// Handle preflight immediately
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
+
 // check database connection 
 $conn = null;
 $conn = checkDbConnection();
@@ -8,7 +20,6 @@ $val = new Roles($conn);
 if (array_key_exists("id", $_GET)) {
     $val->role_aid = $_GET["id"];
 
-    // VALIDATION
     checkId($val->role_aid);
 
     $query = checkDelete($val);
@@ -17,3 +28,4 @@ if (array_key_exists("id", $_GET)) {
 }
 
 checkEndpoint();
+

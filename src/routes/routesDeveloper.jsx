@@ -1,7 +1,10 @@
 import { devNavUrl, urlDeveloper } from "../functions/functions-general";
 import Dashboard from "../pages/developer/dashboard/Dashboard";
 import Employees from "../pages/developer/employees/Employees";
+import Memo from "../pages/developer/memo/Memo";
 import Roles from "../pages/developer/settings/roles/Roles";
+import Users from "../pages/developer/settings/users/Users";
+import Department from "../pages/developer/settings/department/Department"; // NEW
 
 export const routesDeveloper = [
   {
@@ -21,6 +24,14 @@ export const routesDeveloper = [
     ),
   },
   {
+    path: `${devNavUrl}/${urlDeveloper}/settings/users/roles`,
+    element: (
+      <>
+        <Roles />
+      </>
+    ),
+  },
+  {
     path: `${devNavUrl}/${urlDeveloper}/employees`,
     element: (
       <>
@@ -29,10 +40,27 @@ export const routesDeveloper = [
     ),
   },
   {
-    path: `${devNavUrl}/${urlDeveloper}/settings/roles`,
+    path: `${devNavUrl}/${urlDeveloper}/settings/users`,
     element: (
       <>
-        <Roles />
+        <Users />
+      </>
+    ),
+  },
+  {
+    path: `${devNavUrl}/${urlDeveloper}/memo`,
+    element: (
+      <>
+        <Memo />
+      </>
+    ),
+  },
+  // NEW
+  {
+    path: `${devNavUrl}/${urlDeveloper}/settings/department`,
+    element: (
+      <>
+        <Department />
       </>
     ),
   },

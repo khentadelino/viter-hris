@@ -5,28 +5,30 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryData } from "../../../functions/custom-hooks/queryData";
 import { apiVersion } from "../../../functions/functions-general";
 import {
-  setError,
   setIsAdd,
-  setMessage,
   setSuccess,
+  setError,
+  setMessage,
 } from "../../../store/StoreAction";
 import ModalWrapperSide from "../../../partials/modals/ModalWrapperSide";
 import { FaTimes } from "react-icons/fa";
-import { Form, Formik } from "formik";
-import { InputText } from "../../../components/form-inputs/FormInputs";
+import { Formik, Form } from "formik";
 import ButtonSpinner from "../../../partials/spinners/ButtonSpinner";
+import {
+  InputSelect,
+  InputText,
+} from "../../../components/form-input/FormInputs";
 import MessageError from "../../../partials/MessageError";
 
-const ModalAddEmployees = ({ itemEdit }) => {
+const ModalAddEmployees = ({ itemEdit, filterArrayActiveDepartments }) => {
   const { store, dispatch } = React.useContext(StoreContext);
   const queryClient = useQueryClient();
-
   const mutation = useMutation({
     mutationFn: (values) =>
       queryData(
         itemEdit
-          ? `${apiVersion}/controllers/developers/employees/employees.php?id=${itemEdit.employee_aid}`
-          : `${apiVersion}/controllers/developers/employees/employees.php`,
+          ? `${apiVersion}/controllers/developers/employees/employees.php?id=${itemEdit.employee_aid}` // update records
+          : `${apiVersion}/controllers/developers/employees/employees.php`, // create records
         itemEdit ? "put" : "post",
         values,
       ),
@@ -35,12 +37,9 @@ const ModalAddEmployees = ({ itemEdit }) => {
 
       if (data.success) {
         dispatch(setSuccess(true));
-        dispatch(
-          setMessage(`Successfully ${itemEdit ? "updated" : "submitted"}`),
-        );
+        dispatch(setMessage(`Successfully ${itemEdit ? "updated" : "added"}`));
         dispatch(setIsAdd(false));
       }
-
       if (data.success == false) {
         dispatch(setError(true));
         dispatch(setMessage(data.error));
@@ -49,17 +48,23 @@ const ModalAddEmployees = ({ itemEdit }) => {
   });
 
   const initVal = {
+    ...itemEdit,
     employee_first_name: itemEdit ? itemEdit.employee_first_name : "",
     employee_middle_name: itemEdit ? itemEdit.employee_middle_name : "",
     employee_last_name: itemEdit ? itemEdit.employee_last_name : "",
     employee_email: itemEdit ? itemEdit.employee_email : "",
-    employee_is_active: itemEdit ? itemEdit.employee_is_active : 1,
+    employee_department_id: itemEdit ? itemEdit.employee_department_id : "",
+    employee_email_old: itemEdit ? itemEdit.employee_email : "",
   };
 
-  const yupScheme = Yup.object({
-    employee_first_name: Yup.string().trim().required("Required"),
-    employee_last_name: Yup.string().trim().required("Required"),
-    employee_email: Yup.string().trim().email("Invalid email").required("Required"),
+  const yupSchema = Yup.object({
+    employee_first_name: Yup.string().trim().required("required"),
+    employee_last_name: Yup.string().trim().required("required"),
+    employee_department_id: Yup.string().trim().required("required"),
+    employee_email: Yup.string()
+      .trim()
+      .email("Invalid email")
+      .required("required"),
   });
 
   const handleClose = () => {
@@ -68,104 +73,133 @@ const ModalAddEmployees = ({ itemEdit }) => {
 
   React.useEffect(() => {
     dispatch(setError(false));
-  }, [dispatch]);
+  }, []);
 
   return (
-    <ModalWrapperSide
-      handleClose={handleClose}
-      className="transition-all ease-in-out transform duration-200"
-    >
-      <div className="model-header relative mb-4">
-        <h3 className="text-dark text-sm">
-          {itemEdit ? "Update" : "Add"} Employee
-        </h3>
-        <button
-          type="button"
-          onClick={handleClose}
-          className="absolute top-0 right-4"
-        >
-          <FaTimes />
-        </button>
-      </div>
+    <>
+      <ModalWrapperSide
+        handleClose={handleClose}
+        className="transition-all ease-in-out transform duration-200"
+      >
+        {/* header */}
+        <div className="modal-header relative mb-4">
+          <h3 className="text-dark text-sm">
+            {itemEdit ? "Update" : "Add"} Employee
+          </h3>
+          <button
+            type="button"
+            className="absolute top-0 right-4"
+            onClick={handleClose}
+          >
+            <FaTimes />
+          </button>
+        </div>
+        {/* body */}
+        <div className="modal-body">
+          <Formik
+            initialValues={initVal}
+            validationSchema={yupSchema}
+            onSubmit={async (values, { setSubmitting, resetForm }) => {
+              dispatch(setError(false));
+              mutation.mutate(values);
+            }}
+          >
+            {(props) => {
+              return (
+                <Form className="h-full">
+                  <div className="modal-form-container">
+                    <div className="modal-container">
+                      <div className="relative mb-6">
+                        <InputText
+                          label="First Name"
+                          name="employee_first_name"
+                          type="text"
+                          disabled={mutation.isPending}
+                        />
+                      </div>
+                      <div className="relative mb-6">
+                        <InputText
+                          label="Middle Name"
+                          name="employee_middle_name"
+                          type="text"
+                          disabled={mutation.isPending}
+                        />
+                      </div>
+                      <div className="relative mb-6">
+                        <InputText
+                          label="Last Name"
+                          name="employee_last_name"
+                          type="text"
+                          disabled={mutation.isPending}
+                        />
+                      </div>
+                      <div className="relative mb-6">
+                        <InputText
+                          label="Email"
+                          name="employee_email"
+                          type="email"
+                          disabled={mutation.isPending}
+                        />
+                      </div>
 
-      <div className="modal-body">
-        <Formik
-          initialValues={initVal}
-          validationSchema={yupScheme}
-          enableReinitialize
-          onSubmit={async (values) => {
-            mutation.mutate(values);
-          }}
-        >
-          {(props) => (
-            <Form className="h-full">
-              <div className="modal-form-container">
-                <div className="modal-container">
-                  <div className="relative mb-6">
-                    <InputText
-                      label="First Name"
-                      name="employee_first_name"
-                      type="text"
-                      disabled={mutation.isPending}
-                    />
-                  </div>
-                  <div className="relative mb-6">
-                    <InputText
-                      label="Middle Name"
-                      name="employee_middle_name"
-                      type="text"
-                      required={false}
-                      disabled={mutation.isPending}
-                    />
-                  </div>
-                  <div className="relative mb-6">
-                    <InputText
-                      label="Last Name"
-                      name="employee_last_name"
-                      type="text"
-                      disabled={mutation.isPending}
-                    />
-                  </div>
-                  <div className="relative mb-6">
-                    <InputText
-                      label="Email"
-                      name="employee_email"
-                      type="email"
-                      disabled={mutation.isPending}
-                    />
-                  </div>
-                  {store.error && <MessageError />}
-                </div>
+                      <div className="relative mb-6">
+                        <InputSelect
+                          label="Department"
+                          name="employee_department_id"
+                          type="text"
+                          disabled={mutation.isPending}
+                        >
+                          <optgroup label="Select a department">
+                            <option value="" hidden>
+                              --
+                            </option>
+                            {filterArrayActiveDepartments.map((item, key) => {
+                              return (
+                                <option
+                                  key={key}
+                                  value={item.department_aid}
+                                >
+                                  {item.department_name}
+                                </option>
+                              );
+                            })}
+                          </optgroup>
+                        </InputSelect>
 
-                <div className="modal-action">
-                  <button
-                    type="submit"
-                    disabled={mutation.isPending || !props.dirty}
-                    className="btn-modal-submit"
-                  >
-                    {mutation.isPending ? (
-                      <ButtonSpinner />
-                    ) : itemEdit ? (
-                      "Save"
-                    ) : (
-                      "Add"
-                    )}
-                  </button>
-                  <button
-                    type="reset"
-                    className="btn-modal-cancel"
-                    onClick={handleClose}
-                    disabled={mutation.isPending}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            </Form>
-          )}
-        </Formik>
-      </div>
-    </ModalWrapperSide>
+                        {store.error && <MessageError />}
+                      </div>
+                    </div>
+                    <div className="modal-action">
+                      <button
+                        type="submit"
+                        disabled={mutation.isPending || !props.dirty}
+                        className="btn-modal-submit"
+                      >
+                        {mutation.isPending ? (
+                          <ButtonSpinner />
+                        ) : itemEdit ? (
+                          "Save"
+                        ) : (
+                          "Add"
+                        )}
+                      </button>
+                      <button
+                        type="reset"
+                        className="btn-modal-cancel"
+                        onClick={handleClose}
+                        disabled={mutation.isPending}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </Form>
+              );
+            }}
+          </Formik>
+        </div>
+      </ModalWrapperSide>
+    </>
   );
 };
 

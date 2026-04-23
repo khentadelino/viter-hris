@@ -1,5 +1,5 @@
-import { FaSearch } from "react-icons/fa";
 import { setError, setIsSearch, setMessage } from "../store/StoreAction";
+import { FaSearch } from "react-icons/fa";
 
 const SearchBar = ({
   search,

@@ -1,8 +1,8 @@
 import React from "react";
 import { StoreContext } from "../../../store/StoreContext";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { queryDataInfinite } from "../../../functions/custom-hooks/queryDataInfinite";
 import { apiVersion } from "../../../functions/functions-general";
+import { queryDataInfinite } from "../../../functions/custom-hooks/queryDataInfinite";
 import { useInView } from "react-intersection-observer";
 import NoData from "../../../partials/NoData";
 import ServerError from "../../../partials/ServerError";
@@ -10,16 +10,16 @@ import TableLoading from "../../../partials/TableLoading";
 import FetchingSpinner from "../../../partials/spinners/FetchingSpinner";
 import Loadmore from "../../../partials/Loadmore";
 import Status from "../../../partials/Status";
-import ModalArchive from "../../../partials/modals/ModalArchive";
-import ModalRestore from "../../../partials/modals/ModalRestore";
-import ModalDelete from "../../../partials/modals/ModalDelete";
+import { FaArchive, FaEdit, FaTrash, FaTrashRestore } from "react-icons/fa";
 import {
   setIsAdd,
   setIsArchive,
   setIsDelete,
   setIsRestore,
 } from "../../../store/StoreAction";
-import { FaArchive, FaEdit, FaTrash, FaTrashRestore } from "react-icons/fa";
+import ModalArchive from "../../../partials/modals/ModalArchive";
+import ModalRestore from "../../../partials/modals/ModalRestore";
+import ModalDelete from "../../../partials/modals/ModalDelete";
 import SearchBar from "../../../partials/SearchBar";
 
 const EmployeesList = ({ itemEdit, setItemEdit }) => {
@@ -27,13 +27,13 @@ const EmployeesList = ({ itemEdit, setItemEdit }) => {
 
   // page
   const [page, setPage] = React.useState(1);
-  const [filterData, setFilterData] = React.useState(null);
+  const [filterData, setFilterData] = React.useState("");
   const [onSearch, setOnSearch] = React.useState(false);
   const search = React.useRef({ value: "" });
   const { ref, inView } = useInView();
   let counter = 1;
 
-  // use if with loadmore button and search bar
+  // use if with load more button and search bar
   const {
     data: result,
     error,
@@ -46,9 +46,8 @@ const EmployeesList = ({ itemEdit, setItemEdit }) => {
     queryKey: ["employees", search.current.value, store.isSearch, filterData],
     queryFn: async ({ pageParam = 1 }) =>
       await queryDataInfinite(
-        `${apiVersion}/employees/search`, // search endpoint
+        ``, // search endpoint
         `${apiVersion}/controllers/developers/employees/page.php?start=${pageParam}`, // list endpoint
-        // store.isSearch || isFilter, // search boolean, // search boolean
         false,
         {
           filterData,
@@ -57,46 +56,52 @@ const EmployeesList = ({ itemEdit, setItemEdit }) => {
         `post`,
       ),
     getNextPageParam: (lastPage) => {
-      if (lastPage.page + lastPage.count < lastPage.total) {
+      if (lastPage.page < lastPage.total) {
         return lastPage.page + lastPage.count;
       }
-
       return;
     },
     refetchOnWindowFocus: false,
   });
+
   React.useEffect(() => {
-    if (inView && hasNextPage) {
+    if (inView) {
       setPage((prev) => prev + 1);
       fetchNextPage();
     }
-  }, [fetchNextPage, hasNextPage, inView]);
+  }, [inView]);
 
   const handleEdit = (item) => {
     dispatch(setIsAdd(true));
     setItemEdit(item);
   };
+
   const handleArchive = (item) => {
     dispatch(setIsArchive(true));
     setItemEdit(item);
   };
+
   const handleRestore = (item) => {
     dispatch(setIsRestore(true));
     setItemEdit(item);
   };
+
   const handleDelete = (item) => {
     dispatch(setIsDelete(true));
     setItemEdit(item);
   };
+
+  const handleFilterChange = (e) => {
+    setPage(1);
+    setFilterData(e.target.value);
+  };
+
   return (
     <>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between pt-5">
         <div className="relative">
           <label htmlFor="">Status</label>
-          <select
-            onChange={(e) => setFilterData(e.target.value)}
-            value={filterData}
-          >
+          <select onChange={handleFilterChange} value={filterData}>
             <option value="">All</option>
             <option value="1">Active</option>
             <option value="0">Inactive</option>
@@ -109,6 +114,7 @@ const EmployeesList = ({ itemEdit, setItemEdit }) => {
           result={result?.pages}
           isFetching={isFetching}
           setOnSearch={setOnSearch}
+          onSearch={onSearch}
         />
       </div>
       <div className="relative pt-4 rounded-md">
@@ -120,6 +126,7 @@ const EmployeesList = ({ itemEdit, setItemEdit }) => {
               <th>Status</th>
               <th>Employee Name</th>
               <th>Email</th>
+              <th>Department</th> {/* NEW */}
               <th></th>
             </tr>
           </thead>
@@ -136,6 +143,7 @@ const EmployeesList = ({ itemEdit, setItemEdit }) => {
                   </td>
                 </tr>
               )}
+
             {error && (
               <tr>
                 <td colSpan="100%" className="p-10">
@@ -150,16 +158,19 @@ const EmployeesList = ({ itemEdit, setItemEdit }) => {
                     <tr key={key}>
                       <td>{counter++}</td>
                       <td>
-                        <Status
-                          text={`${item.employee_is_active == 1 ? "active" : "inactive"}`}
-                        />
+                        {
+                          <Status
+                            text={`${item.employee_is_active == 1 ? "active" : "inactive"}`}
+                          />
+                        }
                       </td>
                       <td>
                         {item.employee_first_name} {item.employee_last_name}
                       </td>
                       <td>{item.employee_email}</td>
+                      <td>{item.department_name ?? "--"}</td> {/* NEW */}
                       <td>
-                        <div>
+                        <div className="flex items-center gap-3">
                           {item.employee_is_active == 1 ? (
                             <>
                               <button
@@ -223,35 +234,35 @@ const EmployeesList = ({ itemEdit, setItemEdit }) => {
         </div>
       </div>
 
-      {store.isArchive && itemEdit && (
+      {store.isArchive && (
         <ModalArchive
           mysqlApiArchive={`${apiVersion}/controllers/developers/employees/active.php?id=${itemEdit.employee_aid}`}
-          msg="Are you sure you want to archive this record?"
-          successMsg="Successfully Archived"
-          item={`${itemEdit.employee_first_name} ${itemEdit.employee_last_name}`}
           dataItem={itemEdit}
+          msg="Are you sure you want to archive this record?"
+          successMsg={"Successfully archived"}
+          item={`${itemEdit.employee_first_name} ${itemEdit.employee_last_name}`}
           queryKey="employees"
         />
       )}
 
-      {store.isRestore && itemEdit && (
+      {store.isRestore && (
         <ModalRestore
           mysqlApiRestore={`${apiVersion}/controllers/developers/employees/active.php?id=${itemEdit.employee_aid}`}
-          msg="Are you sure you want to Restore this record?"
-          successMsg="Successfully Restored"
-          item={`${itemEdit.employee_first_name} ${itemEdit.employee_last_name}`}
           dataItem={itemEdit}
+          msg="Are you sure you want to restore this record?"
+          successMsg={"Successfully restored"}
+          item={`${itemEdit.employee_first_name} ${itemEdit.employee_last_name}`}
           queryKey="employees"
         />
       )}
 
-      {store.isDelete && itemEdit && (
+      {store.isDelete && (
         <ModalDelete
           mysqlApiDelete={`${apiVersion}/controllers/developers/employees/employees.php?id=${itemEdit.employee_aid}`}
-          msg="Are you sure you want to Delete this record?"
-          successMsg="Successfully Deleted"
-          item={`${itemEdit.employee_first_name} ${itemEdit.employee_last_name}`}
           dataItem={itemEdit}
+          msg="Are you sure you want to delete this record?"
+          successMsg={"Successfully deleted"}
+          item={`${itemEdit.employee_first_name} ${itemEdit.employee_last_name}`}
           queryKey="employees"
         />
       )}

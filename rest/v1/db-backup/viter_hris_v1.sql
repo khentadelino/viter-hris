@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 16, 2026 at 08:51 AM
+-- Generation Time: Apr 16, 2026 at 08:54 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -29,10 +29,10 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `employees` (
   `employee_aid` int(11) NOT NULL,
-  `employee_is_active` tinyint(1) NOT NULL,
-  `employee_first_name` varchar(128) NOT NULL,
-  `employee_middle_name` varchar(128) NOT NULL,
-  `employee_last_name` varchar(128) NOT NULL,
+  `employee_is_active` double NOT NULL,
+  `employee_first_name` varchar(123) NOT NULL,
+  `employee_middle_name` varchar(123) NOT NULL,
+  `employee_last_name` varchar(123) NOT NULL,
   `employee_email` varchar(255) NOT NULL,
   `employee_created` datetime NOT NULL,
   `employee_updated` datetime NOT NULL
@@ -41,10 +41,10 @@ CREATE TABLE `employees` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `settiings_roles`
+-- Table structure for table `settings_roles`
 --
 
-CREATE TABLE `settiings_roles` (
+CREATE TABLE `settings_roles` (
   `role_aid` int(11) NOT NULL,
   `role_is_active` tinyint(1) NOT NULL,
   `role_name` varchar(128) NOT NULL,
@@ -54,12 +54,17 @@ CREATE TABLE `settiings_roles` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `settiings_roles`
+-- Dumping data for table `settings_roles`
 --
 
-INSERT INTO `settiings_roles` (`role_aid`, `role_is_active`, `role_name`, `role_description`, `role_created`, `role_updated`) VALUES
-(3, 1, 'test', '12345', '2026-04-16 10:04:48', '2026-04-16 10:04:48'),
-(4, 1, 'def', '12345', '2026-04-16 12:04:50', '2026-04-16 12:04:50');
+INSERT INTO `settings_roles` (`role_aid`, `role_is_active`, `role_name`, `role_description`, `role_created`, `role_updated`) VALUES
+(50, 1, 'dfsdfsdfssdfsafsdfa', 'ffsfssffdfd', '2026-04-16 10:04:38', '2026-04-16 10:04:38'),
+(51, 1, 'xxx', 'ffsfssffdfd', '2026-04-16 10:04:52', '2026-04-16 10:04:52'),
+(52, 1, 'xxxxxxxx', 'ffsfssffdfd', '2026-04-16 10:04:00', '2026-04-16 10:04:00'),
+(53, 1, 'hjjhghg', 'hghgghgjhh', '2026-04-16 10:04:09', '2026-04-16 10:04:09'),
+(54, 1, 'iopiopoi', 'poipiopp', '2026-04-16 10:04:14', '2026-04-16 10:04:14'),
+(55, 1, 'developer', 'xx', '2026-04-16 10:04:40', '2026-04-16 12:04:19'),
+(56, 1, 'admin', 'admin', '2026-04-16 12:04:11', '2026-04-16 12:04:11');
 
 --
 -- Indexes for dumped tables
@@ -72,9 +77,9 @@ ALTER TABLE `employees`
   ADD PRIMARY KEY (`employee_aid`);
 
 --
--- Indexes for table `settiings_roles`
+-- Indexes for table `settings_roles`
 --
-ALTER TABLE `settiings_roles`
+ALTER TABLE `settings_roles`
   ADD PRIMARY KEY (`role_aid`);
 
 --
@@ -88,10 +93,10 @@ ALTER TABLE `employees`
   MODIFY `employee_aid` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `settiings_roles`
+-- AUTO_INCREMENT for table `settings_roles`
 --
-ALTER TABLE `settiings_roles`
-  MODIFY `role_aid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+ALTER TABLE `settings_roles`
+  MODIFY `role_aid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

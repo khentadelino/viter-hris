@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 16, 2026 at 08:51 AM
+-- Generation Time: Apr 16, 2026 at 08:55 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -29,10 +29,10 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `employees` (
   `employee_aid` int(11) NOT NULL,
-  `employee_is_active` tinyint(1) NOT NULL,
-  `employee_first_name` varchar(128) NOT NULL,
-  `employee_middle_name` varchar(128) NOT NULL,
-  `employee_last_name` varchar(128) NOT NULL,
+  `employee_is_active` double NOT NULL,
+  `employee_first_name` varchar(123) NOT NULL,
+  `employee_middle_name` varchar(123) NOT NULL,
+  `employee_last_name` varchar(123) NOT NULL,
   `employee_email` varchar(255) NOT NULL,
   `employee_created` datetime NOT NULL,
   `employee_updated` datetime NOT NULL

@@ -20,7 +20,7 @@ const Layout = ({ children, menu = "", submenu = "" }) => {
 
       {/* FOOTER */}
 
-      {/* MODAL SUCCESS */}
+      {/* MODAL */}
       {store.success && <ModalSuccess />}
     </>
   );

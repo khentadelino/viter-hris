@@ -2,39 +2,36 @@ import React, { useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
-const NavigationAccordions = ({ item, subNavList = [] }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
+const NavigationAccordions = ({ subNavList = [], item }) => {
+  const [isOpen, setIsOpen] = React.useState(false);
+  useState(false);
   return (
     <>
       <button
-        onClick={() => setIsOpen((prev) => !prev)}
-        className="w-full px-4 py-2 uppercase flex items-center justify-between gap-2 hover:bg-gray-50/10 transition"
+        className="w-full px-4 py-1 hover:bg-gray-50/10 flex item-center justify-between gap-2"
+        onClick={() => setIsOpen(!isOpen)}
       >
         <div className="flex items-center gap-2">
-          {item?.icon}
-          <span>{item?.label}</span>
+          {item.icon}
+          {item.label}
         </div>
-
-        <FaChevronDown
-          className={`transition-transform duration-200 ${
-            isOpen ? "rotate-180" : ""
-          }`}
-        />
+        <FaChevronDown />
       </button>
 
       {isOpen && (
-        <ul className="w-full self-start">
-          {subNavList.map((item, key) => (
-            <li key={key} className="w-full">
-              <Link
-                to={item.path}
-                className="w-full block  pl-10 py-1 hover:bg-gray-50/10 transition"
-              >
-                {item.label}
-              </Link>
-            </li>
-          ))}
+        <ul className="self-start w-full">
+          {subNavList.map((item, key) => {
+            return (
+              <li key={key} className="w-full">
+                <Link
+                  to={item.path}
+                  className="block pl-10 w-full hover:bg-gray-50/10"
+                >
+                  {item.label}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       )}
     </>

@@ -22,32 +22,37 @@ import ModalDelete from "../../../../partials/modals/ModalDelete";
 
 const RolesList = ({ itemEdit, setItemEdit }) => {
   const { store, dispatch } = React.useContext(StoreContext);
+
   const {
     isLoading,
     isFetching,
     data: dataRoles,
   } = useQueryData(
-    `${apiVersion}/controllers/developers/settings/roles/roles.php`,
-    "get",
-    "roles",
+    `${apiVersion}/controllers/developers/settings/roles/roles.php`, //api path file
+    "get", //method request(get,post,put,delete)
+    "roles", //query key
   );
 
   const handleEdit = (item) => {
     dispatch(setIsAdd(true));
     setItemEdit(item);
   };
+
   const handleArchive = (item) => {
     dispatch(setIsArchive(true));
     setItemEdit(item);
   };
+
   const handleRestore = (item) => {
     dispatch(setIsRestore(true));
     setItemEdit(item);
   };
+
   const handleDelete = (item) => {
     dispatch(setIsDelete(true));
     setItemEdit(item);
   };
+
   return (
     <>
       <div className="relative pt-4 rounded-md">
@@ -57,10 +62,10 @@ const RolesList = ({ itemEdit, setItemEdit }) => {
             <tr>
               <th>#</th>
               <th>Status</th>
-              <th>Roles</th>
+              <th>Role</th>
               <th>Description</th>
               <th>Created</th>
-              <th>Date Update</th>
+              <th>Date update</th>
               <th></th>
             </tr>
           </thead>
@@ -78,7 +83,7 @@ const RolesList = ({ itemEdit, setItemEdit }) => {
                 </td>
               </tr>
             ) : (
-              dataRoles?.data.map((item, key) => {
+              dataRoles?.data?.map((item, key) => {
                 return (
                   <tr key={key}>
                     <td>{key + 1}.</td>
@@ -92,7 +97,7 @@ const RolesList = ({ itemEdit, setItemEdit }) => {
                     <td>{formatDate(item.role_created, "--", "short-date")}</td>
                     <td>{formatDate(item.role_updated, "--", "short-date")}</td>
                     <td>
-                      <div>
+                      <div className="flex items-center gap-3">
                         {item.role_is_active == 1 ? (
                           <>
                             <button
@@ -145,30 +150,32 @@ const RolesList = ({ itemEdit, setItemEdit }) => {
       {store.isArchive && (
         <ModalArchive
           mysqlApiArchive={`${apiVersion}/controllers/developers/settings/roles/active.php?id=${itemEdit.role_aid}`}
-          msg="Are you sure you want to archive this record?"
-          successMsg="Successfully Archived"
-          item={itemEdit.role_name}
           dataItem={itemEdit}
+          msg="Are you sure you want to archive this record?"
+          successMsg={"Successfully archived"}
+          item={itemEdit.role_name}
           queryKey="roles"
         />
       )}
+
       {store.isRestore && (
         <ModalRestore
           mysqlApiRestore={`${apiVersion}/controllers/developers/settings/roles/active.php?id=${itemEdit.role_aid}`}
-          msg="Are you sure you want to Restore this record?"
-          successMsg="Successfully Restored"
-          item={itemEdit.role_name}
           dataItem={itemEdit}
+          msg="Are you sure you want to restore this record?"
+          successMsg={"Successfully restore"}
+          item={itemEdit.role_name}
           queryKey="roles"
         />
       )}
+
       {store.isDelete && (
         <ModalDelete
           mysqlApiDelete={`${apiVersion}/controllers/developers/settings/roles/roles.php?id=${itemEdit.role_aid}`}
-          msg="Are you sure you want to Delete this record?"
-          successMsg="Successfully Deleted"
-          item={itemEdit.role_name}
           dataItem={itemEdit}
+          msg="Are you sure you want to delete this record?"
+          successMsg={"Successfully deleted"}
+          item={itemEdit.role_name}
           queryKey="roles"
         />
       )}

@@ -1,4 +1,4 @@
-import { FaCogs, FaUser } from "react-icons/fa";
+import { FaCogs, FaNewspaper, FaUser } from "react-icons/fa";
 import { MdDashboard } from "react-icons/md";
 import { devNavUrl, urlDeveloper } from "../../functions/functions-general";
 
@@ -18,19 +18,31 @@ export const navList = [
     submenu: "",
   },
   {
-    label: "Settings",
+    label: "SETTINGS",
     icon: <FaCogs />,
     menu: "settings",
     submenu: "",
     subNavList: [
       {
-        label: "Role",
-        path: `${devNavUrl}/${urlDeveloper}/settings/roles`,
+        label: "Roles",
+        path: `${devNavUrl}/${urlDeveloper}/settings/users/roles`,
       },
       {
         label: "users",
         path: `${devNavUrl}/${urlDeveloper}/settings/users`,
       },
+      // NEW
+      {
+        label: "Department",
+        path: `${devNavUrl}/${urlDeveloper}/settings/department`,
+      },
     ],
+  },
+  {
+    label: "Memo",
+    icon: <FaNewspaper />,
+    menu: "memo",
+    path: `${devNavUrl}/${urlDeveloper}/memo`,
+    submenu: "",
   },
 ];

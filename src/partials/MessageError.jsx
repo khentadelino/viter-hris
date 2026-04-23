@@ -1,7 +1,7 @@
-import { StoreContext } from "../store/StoreContext";
 import React from "react";
 import { FaTimes } from "react-icons/fa";
 import { setError } from "../store/StoreAction";
+import { StoreContext } from "../store/StoreContext";
 
 const MessageError = () => {
   const { store, dispatch } = React.useContext(StoreContext);

@@ -1,16 +1,18 @@
 import React from "react";
+import Layout from "../Layout";
 import { StoreContext } from "../../../store/StoreContext";
 import { setIsAdd } from "../../../store/StoreAction";
 import { FaPlus } from "react-icons/fa";
-import Layout from "../Layout";
 
 const Dashboard = () => {
-  const { store, dispatch } = React.useContext(StoreContext);
+  const { store, dispatch } = React.useState(StoreContext);
   const [itemEdit, setItemEdit] = React.useState(null);
+
   const handleAdd = () => {
     dispatch(setIsAdd(true));
     setItemEdit(null);
   };
+
   return (
     <>
       <Layout menu="dashboard">
@@ -28,6 +30,7 @@ const Dashboard = () => {
             </button>
           </div>
         </div>
+
         {/* PAGE CONTENT */}
         <div>
           {/* <RolesList itemEdit={itemEdit} setItemEdit={setItemEdit} /> */}

@@ -6,12 +6,14 @@ export const devNavUrl = "";
 export const apiVersion = "/v1";
 
 export const setTimezone = "Asia/Manila";
+
 // ROLES VARIABLE
 export const urlDeveloper = "developer";
 
 // dev API KEY
 export const devKey = "123devkey";
 
+// format the numbers separated by comma
 export const isEmptyItem = (item, x = "") => {
   let result = x;
 
@@ -31,13 +33,9 @@ export const formatDate = (dateVal, val = "", format = "") => {
   }
   return formatedDate;
 };
-export const dateOptions = (format = "") => {
-  let options = {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  };
 
+export const dateOptions = (format = "") => {
+  const options = { month: "long", day: "numeric", year: "numeric" };
   if (format == "short-date") {
     return {
       month: "short",
@@ -45,7 +43,6 @@ export const dateOptions = (format = "") => {
       year: "numeric",
     };
   }
-
   return options;
 };
 

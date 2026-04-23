@@ -3,7 +3,6 @@
 require 'Database.php';
 require 'Response.php';
 
-
 function checkDbConnection()
 {
     try {
@@ -11,11 +10,11 @@ function checkDbConnection()
         return $conn;
     } catch (PDOException $error) {
         $response = new Response();
-        $response->setSuccess(false);
         $error = [];
         $error['type'] = "invalid_request_error";
         $error['success'] = false;
-        $error['error'] = "Database connection false";
+        $error['error'] = "Database connection failed.";
+        $response->setSuccess(false);
         $response->setData($error);
         $response->send();
         exit;
@@ -164,16 +163,13 @@ function checkReadQuery($query, $total_result, $object_total, $object_start)
 {
     $response = new Response();
     $returnData = [];
-    $perPage = (int)$object_total;
-    $start = (int)$object_start;
-    $totalRows = $total_result->rowCount();
 
     $returnData["data"] = getResultData($query);
     $returnData["count"] = $query->rowCount();
-    $returnData["total"] = $totalRows;
-    $returnData["per_page"] = $perPage;
-    $returnData["page"] = $start;
-    $returnData["total_pages"] = $perPage > 0 ? (int)ceil($totalRows / $perPage) : 0;
+    $returnData["total"] = $total_result->rowCount();
+    $returnData["per_page"] = $object_total;
+    $returnData["page"] = (int) $object_start;
+    $returnData["total_pages"] = ceil($total_result->rowCount() / $object_total);
     $returnData["success"] = true;
     $returnData["server_datetime"] = date('Y-m-d H:i:s');
     $returnData["server_date"] = date('Y-m-d');
@@ -386,12 +382,19 @@ function isNameExist($object, $name)
     checkExistence($count, "{$name} already exist.");
 }
 
+function isFullNameExist($object, $first_name, $last_name, $msg = "")
+{
+    $query = $object->checkName();
+    $count = $query->rowCount();
+    checkExistence($count, $msg !== "" ? $msg : "{$first_name} {$last_name} already exist.");
+}
+
 // check email
-function isEmailExist($object, $email)
+function isEmailExist($object, $email, $msg = "")
 {
     $query = $object->checkEmail();
     $count = $query->rowCount();
-    checkExistence($count, "{$email} already exist.");
+    checkExistence($count, $msg !== "" ? $msg : "{$email} already exist.");
 }
 
 // check id
@@ -405,16 +408,26 @@ function isIdExist($object)
 // compare name
 function compareName($object, $name_old, $name)
 {
-    if (strtolower($name_old) !=  strtolower($name)) {
+    if (strtolower($name_old) != strtolower($name)) {
         isNameExist($object, $name);
     }
 }
 
-// compare email
-function compareEmail($object, $email_old, $email)
+function compareFullName($object, $first_name_old, $first_name, $last_name_old, $last_name, $msg = "")
 {
-    if (strtolower($email_old) !=  strtolower($email)) {
-        isEmailExist($object, $email);
+    if (
+        strtolower(trim($first_name_old)) != strtolower(trim($first_name)) ||
+        strtolower(trim($last_name_old)) != strtolower(trim($last_name))
+    ) {
+        isFullNameExist($object, $first_name, $last_name, $msg);
+    }
+}
+
+// compare email
+function compareEmail($object, $email_old, $email, $msg = "")
+{
+    if (strtolower($email_old) != strtolower($email)) {
+        isEmailExist($object, $email, $msg);
     }
 }
 
@@ -430,7 +443,7 @@ function isAssociated($object)
 // compare two values
 function compareTwoValues($object, $name_old, $name, $id_old, $id)
 {
-    if (strtolower($name_old) !=  strtolower($name) || strtolower($id_old) !=  strtolower($id)) {
+    if (strtolower($name_old) != strtolower($name) || strtolower($id_old) != strtolower($id)) {
         isNameExist($object, $name);
     }
 }
@@ -652,6 +665,7 @@ function calculateAge($birthDate)
 
 function isEmptyItem($val, $secondVal = '')
 {
-    if ($val) return $val;
+    if ($val)
+        return $val;
     return $secondVal;
 }
