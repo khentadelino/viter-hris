@@ -126,7 +126,7 @@ const EmployeesList = ({ itemEdit, setItemEdit }) => {
               <th>Status</th>
               <th>Employee Name</th>
               <th>Email</th>
-              <th>Department</th> {/* NEW */}
+              <th>Department</th>
               <th></th>
             </tr>
           </thead>
