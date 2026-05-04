@@ -14,6 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 
 require '../../../../core/header.php';
 require '../../../../core/functions.php';
+require '../../../../core/Encryption.php';
 require '../../../../models/developers/settings/users/Users.php';
 
 // get payload from frontend

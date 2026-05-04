@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 16, 2026 at 08:55 AM
+-- Generation Time: Apr 24, 2026 at 01:18 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -24,40 +24,43 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `employees`
+-- Table structure for table `settings_department`
 --
 
-CREATE TABLE `employees` (
-  `employee_aid` int(11) NOT NULL,
-  `employee_is_active` double NOT NULL,
-  `employee_first_name` varchar(123) NOT NULL,
-  `employee_middle_name` varchar(123) NOT NULL,
-  `employee_last_name` varchar(123) NOT NULL,
-  `employee_email` varchar(255) NOT NULL,
-  `employee_department_id` int(11) DEFAULT NULL,
-  `employee_created` datetime NOT NULL,
-  `employee_updated` datetime NOT NULL
+CREATE TABLE `settings_department` (
+  `department_aid` int(11) NOT NULL,
+  `department_is_active` tinyint(1) NOT NULL,
+  `department_name` varchar(200) NOT NULL,
+  `department_created` datetime NOT NULL,
+  `department_updated` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `settings_department`
+--
+
+INSERT INTO `settings_department` (`department_aid`, `department_is_active`, `department_name`, `department_created`, `department_updated`) VALUES
+(1, 1, 'Admin', '2026-04-24 07:16:34', '2026-04-24 07:16:34');
 
 --
 -- Indexes for dumped tables
 --
 
 --
--- Indexes for table `employees`
+-- Indexes for table `settings_department`
 --
-ALTER TABLE `employees`
-  ADD PRIMARY KEY (`employee_aid`);
+ALTER TABLE `settings_department`
+  ADD PRIMARY KEY (`department_aid`);
 
 --
 -- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT for table `employees`
+-- AUTO_INCREMENT for table `settings_department`
 --
-ALTER TABLE `employees`
-  MODIFY `employee_aid` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `settings_department`
+  MODIFY `department_aid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

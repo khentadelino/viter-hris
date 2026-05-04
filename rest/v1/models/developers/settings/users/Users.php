@@ -8,6 +8,7 @@ class Users
     public $users_email;
     public $users_last_name;
     public $users_password;
+    public $users_key;
     public $users_role_id;
     public $users_created;
     public $users_updated;
@@ -25,7 +26,7 @@ class Users
     public function __construct($db)
     {
         $this->connection = $db;
-        $this->tblSettingsRoles = "settiings_roles";
+        $this->tblSettingsRoles = "settings_roles";
         $this->tblSettingsUsers = "settings_users";
     }
 
@@ -39,6 +40,7 @@ class Users
             $sql .= " users_last_name, ";
             $sql .= " users_email, ";
             $sql .= " users_password, ";
+            $sql .= " users_key, ";
             $sql .= " users_role_id, ";
             $sql .= " users_created, ";
             $sql .= " users_updated ";
@@ -48,6 +50,7 @@ class Users
             $sql .= " :users_last_name, ";
             $sql .= " :users_email, ";
             $sql .= " :users_password, ";
+            $sql .= " :users_key, ";
             $sql .= " :users_role_id, ";
             $sql .= " :users_created, ";
             $sql .= " :users_updated ";
@@ -59,6 +62,7 @@ class Users
                 "users_last_name" => $this->users_last_name,
                 "users_email" => $this->users_email,
                 "users_password" => $this->users_password,
+                "users_key" => $this->users_key,
                 "users_role_id" => $this->users_role_id,
                 "users_created" => $this->users_created,
                 "users_updated" => $this->users_updated,
@@ -72,36 +76,38 @@ class Users
     public function readAll()
     {
         try {
-            // JOINING TABLE
-            $sql = "select ";
-            $sql .= " * ";
-            $sql .= " from {$this->tblSettingsUsers} as users, ";
-            $sql .= " {$this->tblSettingsRoles} as roles ";
-            $sql .= " where users.users_role_id = roles.role_aid ";
-            // FILTER
-            $sql .= $this->users_is_active != '' ? " and users.users_is_active = :users_is_active " : " ";
-            // SEARCH
+            $sql = "select * ";
+            $sql .= "from {$this->tblSettingsUsers} as users ";
+            $sql .= "inner join {$this->tblSettingsRoles} as roles ";
+            $sql .= "on users.users_role_id = roles.role_aid ";
+            $sql .= "where true ";
+            $sql .= $this->users_is_active !== null && $this->users_is_active !== ""
+                ? " and users.users_is_active = :users_is_active "
+                : " ";
             $sql .= $this->search != '' ? " and ( " : " ";
-            $sql .= $this->search != '' ? " users.users_first_name like :users_first_name  " : " ";
-            $sql .= $this->search != '' ? " or users.users_last_name like :users_last_name  " : " ";
-            $sql .= $this->search != '' ? " or users.users_email like :users_email  " : " ";
+            $sql .= $this->search != '' ? " users.users_first_name like :users_first_name " : " ";
+            $sql .= $this->search != '' ? " or users.users_last_name like :users_last_name " : " ";
+            $sql .= $this->search != '' ? " or users.users_email like :users_email " : " ";
             $sql .= $this->search != '' ? " or CONCAT(users.users_last_name,' ',users.users_first_name) like :users_last_fullname " : " ";
             $sql .= $this->search != '' ? " or CONCAT(users.users_first_name,' ',users.users_last_name) like :users_first_fullname " : " ";
             $sql .= $this->search != '' ? " ) " : " ";
+            $sql .= " order by users.users_aid desc ";
             $query = $this->connection->prepare($sql);
-            $query->execute([
-                // FOR FILTER 
-                ...$this->users_is_active != '' ? ["users_is_active" => $this->users_is_active] : [],
-                // FOR SEARCHING
-                ...$this->search != '' ? [
-                    "users_first_name" => "%{$this->search}%",
-                    "users_last_name" => "%{$this->search}%",
-                    "users_email" => "%{$this->search}%",
-                    "users_last_fullname" => "%{$this->search}%",
-                    "users_first_fullname" => "%{$this->search}%",
-                ] : [],
-            ]);
-        } catch (PROException $e) {
+
+            if ($this->users_is_active !== null && $this->users_is_active !== "") {
+                $query->bindValue(":users_is_active", $this->users_is_active);
+            }
+            if ($this->search != '') {
+                $search = "%{$this->search}%";
+                $query->bindValue(":users_first_name", $search);
+                $query->bindValue(":users_last_name", $search);
+                $query->bindValue(":users_email", $search);
+                $query->bindValue(":users_last_fullname", $search);
+                $query->bindValue(":users_first_fullname", $search);
+            }
+
+            $query->execute();
+        } catch (PDOException $e) {
             $query = false;
         }
         return $query;
@@ -109,42 +115,41 @@ class Users
     public function readLimit()
     {
         try {
-            // JOINING TABLE
-            $sql = "select ";
-            $sql .= " * ";
-            $sql .= " from {$this->tblSettingsUsers} as users, ";
-            $sql .= " {$this->tblSettingsRoles} as roles ";
-            $sql .= " where users.users_role_id = roles.role_aid ";
-            // FILTER
-            $sql .= $this->users_is_active != '' ? " and users.users_is_active = :users_is_active " : " ";
-            // SEARCH
+            $sql = "select * ";
+            $sql .= "from {$this->tblSettingsUsers} as users ";
+            $sql .= "inner join {$this->tblSettingsRoles} as roles ";
+            $sql .= "on users.users_role_id = roles.role_aid ";
+            $sql .= "where true ";
+            $sql .= $this->users_is_active !== null && $this->users_is_active !== ""
+                ? " and users.users_is_active = :users_is_active "
+                : " ";
             $sql .= $this->search != '' ? " and ( " : " ";
-            $sql .= $this->search != '' ? " users.users_first_name like :users_first_name  " : " ";
-            $sql .= $this->search != '' ? " or users.users_last_name like :users_last_name  " : " ";
-            $sql .= $this->search != '' ? " or users.users_email like :users_email  " : " ";
+            $sql .= $this->search != '' ? " users.users_first_name like :users_first_name " : " ";
+            $sql .= $this->search != '' ? " or users.users_last_name like :users_last_name " : " ";
+            $sql .= $this->search != '' ? " or users.users_email like :users_email " : " ";
             $sql .= $this->search != '' ? " or CONCAT(users.users_last_name,' ',users.users_first_name) like :users_last_fullname " : " ";
             $sql .= $this->search != '' ? " or CONCAT(users.users_first_name,' ',users.users_last_name) like :users_first_fullname " : " ";
             $sql .= $this->search != '' ? " ) " : " ";
-            // THIS IS FOR PAGINATION LIKE FACEBOOK SCROLLING
-            $sql .= "limit :start, ";
-            $sql .= " :total ";
+            $sql .= " order by users.users_aid desc ";
+            $sql .= " limit :start, :total ";
             $query = $this->connection->prepare($sql);
-            $query->execute([
-                // FOR FILTER 
-                ...$this->users_is_active != '' ? ["users_is_active" => $this->users_is_active] : [],
-                // FOR SEARCHING
-                ...$this->search != '' ? [
-                    "users_first_name" => "%{$this->search}%",
-                    "users_last_name" => "%{$this->search}%",
-                    "users_email" => "%{$this->search}%",
-                    "users_last_fullname" => "%{$this->search}%",
-                    "users_first_fullname" => "%{$this->search}%",
-                ] : [],
-                "start" => $this->start - 1,
-                "total" => $this->total,
+            $query->bindValue(":start", (int) $this->start - 1, PDO::PARAM_INT);
+            $query->bindValue(":total", (int) $this->total, PDO::PARAM_INT);
 
-            ]);
-        } catch (PROException $e) {
+            if ($this->users_is_active !== null && $this->users_is_active !== "") {
+                $query->bindValue(":users_is_active", $this->users_is_active);
+            }
+            if ($this->search != '') {
+                $search = "%{$this->search}%";
+                $query->bindValue(":users_first_name", $search);
+                $query->bindValue(":users_last_name", $search);
+                $query->bindValue(":users_email", $search);
+                $query->bindValue(":users_last_fullname", $search);
+                $query->bindValue(":users_first_fullname", $search);
+            }
+
+            $query->execute();
+        } catch (PDOException $e) {
             $query = false;
         }
         return $query;
@@ -222,7 +227,7 @@ class Users
                 "users_first_name" => $this->users_first_name,
                 "users_last_name" => $this->users_last_name,
             ]);
-        } catch (PROException $e) {
+        } catch (PDOException $e) {
             $query = false;
         }
         return $query;
